@@ -1,43 +1,24 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class ToolController : ControllerBase
 {
-    [HttpPost("run")]
-    public IActionResult RunTool([FromBody] string args)
+    [HttpGet("run")]
+    public IActionResult RunExe()
     {
-        // Determine the path of the .exe
-        var exeName = "ULTRAKILL.exe";
-        // Use the base directory of the application
-        var exePath = Path.Combine(AppContext.BaseDirectory, exeName);
+        var process = new Process();
+        process.StartInfo.FileName = "/app/YourApp.exe"; // path inside Docker
+        process.StartInfo.Arguments = ""; // any arguments
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
 
-        if (!System.IO.File.Exists(exePath))
-            return NotFound($"Executable not found at {exePath}");
+        process.Start();
+        string output = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
 
-        var psi = new ProcessStartInfo
-        {
-            FileName = exePath,
-            Arguments = args,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            WorkingDirectory = Path.GetDirectoryName(exePath)
-        };
-
-        using (var process = Process.Start(psi))
-        {
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-
-            return Ok(new {
-                ExitCode = process.ExitCode,
-                StdOut = output,
-                StdErr = error
-            });
-        }
+        return Content(output); // send output back to browser
     }
 }
