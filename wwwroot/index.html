@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Run EXE Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        input, button { padding: 5px; font-size: 16px; }
+        #output { margin-top: 20px; white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Run EXE Tool</h1>
+    <label for="args">Arguments:</label>
+    <input type="text" id="args" placeholder="Enter arguments">
+    <button onclick="runExe()">Run EXE</button>
+
+    <div id="output">Output will appear here...</div>
+
+    <script>
+        async function runExe() {
+            const args = document.getElementById('args').value;
+            const outputDiv = document.getElementById('output');
+            outputDiv.textContent = 'Running...';
+
+            try {
+                const response = await fetch(`/Tool/run?args=${encodeURIComponent(args)}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    outputDiv.textContent = 'Error: ' + response.statusText;
+                    return;
+                }
+
+                const result = await response.json();
+                outputDiv.textContent = 
+                    `Exit Code: ${result.ExitCode}\n` +
+                    `Output:\n${result.Output}\n` +
+                    `Error:\n${result.Error}`;
+            } catch (err) {
+                outputDiv.textContent = 'Exception: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
