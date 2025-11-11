@@ -11,7 +11,7 @@ namespace MyWebApp.Controllers
         public IActionResult RunExe([FromQuery] string args = "")
         {
             // Make sure your EXE is in the base directory
-            string exePath = Path.Combine(AppContext.BaseDirectory, "YourApp.exe");
+            string exePath = Path.Combine(AppContext.BaseDirectory, "ULTRAKILL.exe");
             
             if (!System.IO.File.Exists(exePath))
                 return NotFound("EXE file not found.");
