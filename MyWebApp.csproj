@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <!-- Include your exe file in the project so it gets published -->
-    <None Include="MyTool.exe">
+    <None Include="ULTRAKILL.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
