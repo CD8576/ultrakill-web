@@ -1,43 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+var builder = WebApplication.CreateBuilder(args);
 
-[ApiController]
-[Route("[controller]")]
-public class ToolController : ControllerBase
-{
-    [HttpGet("run")]
-    public IActionResult RunTool()
-    {
-        try
-        {
-            var exePath = Path.Combine(AppContext.BaseDirectory, "ULTRAKILL.exe");
+// Add controllers
+builder.Services.AddControllers();
 
-            var processInfo = new ProcessStartInfo
-            {
-                FileName = exePath,
-                Arguments = "", // Add any arguments here
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+var app = builder.Build();
 
-            using (var process = Process.Start(processInfo))
-            {
-                process.WaitForExit();
+// Default route at /
+app.MapGet("/", () => "Hello! The API is running.");
 
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
+// Map your existing controllers
+app.MapControllers();
 
-                if (!string.IsNullOrEmpty(error))
-                    return BadRequest(error);
+// Make sure the app listens on all interfaces (needed for Koyeb)
+app.Urls.Add("http://+:80");
 
-                return Ok(output); // return EXE output to the user
-            }
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-    }
-}
+app.Run();
