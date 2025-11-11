@@ -1,0 +1,4 @@
+# config.yml
+startSecret: "supersecret"
+exeName: "ULTRAKILL.exe"
+workingDirectory: "."  # relative to container working dir
