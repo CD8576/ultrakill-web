@@ -1,24 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-[ApiController]
-[Route("[controller]")]
-public class ToolController : ControllerBase
+namespace MyWebApp.Controllers
 {
-    [HttpGet("run")]
-    public IActionResult RunExe()
+    [ApiController]
+    [Route("[controller]")]
+    public class ToolController : ControllerBase
     {
-        var process = new Process();
-        process.StartInfo.FileName = "/app/YourApp.exe"; // path inside Docker
-        process.StartInfo.Arguments = ""; // any arguments
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.CreateNoWindow = true;
+        [HttpGet("run")]
+        public IActionResult RunTool()
+        {
+            var exePath = Path.Combine(AppContext.BaseDirectory, "ULTRAKILL.exe");
 
-        process.Start();
-        string output = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
+            if (!System.IO.File.Exists(exePath))
+                return NotFound("Executable not found.");
 
-        return Content(output); // send output back to browser
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = exePath,
+                    Arguments = "", // add arguments if needed
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            process.Start();
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (!string.IsNullOrEmpty(error))
+                return BadRequest(error);
+
+            return Ok(output);
+        }
     }
 }
