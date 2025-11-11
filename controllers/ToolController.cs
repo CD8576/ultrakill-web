@@ -9,7 +9,7 @@ public class ToolController : ControllerBase
     public IActionResult RunTool([FromBody] string args)
     {
         // Determine the path of the .exe
-        var exeName = "MyTool.exe";
+        var exeName = "ULTRAKILL.exe";
         // Use the base directory of the application
         var exePath = Path.Combine(AppContext.BaseDirectory, exeName);
 
