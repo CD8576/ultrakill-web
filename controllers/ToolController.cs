@@ -7,36 +7,38 @@ namespace MyWebApp.Controllers
     [Route("[controller]")]
     public class ToolController : ControllerBase
     {
-        [HttpGet("run")]
-        public IActionResult RunTool()
+        [HttpPost("run")]
+        public IActionResult RunExe([FromQuery] string args = "")
         {
-            var exePath = Path.Combine(AppContext.BaseDirectory, "ULTRAKILL.exe");
-
+            // Make sure your EXE is in the base directory
+            string exePath = Path.Combine(AppContext.BaseDirectory, "YourApp.exe");
+            
             if (!System.IO.File.Exists(exePath))
-                return NotFound("Executable not found.");
+                return NotFound("EXE file not found.");
 
-            var process = new Process
+            try
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = exePath,
-                    Arguments = "", // add arguments if needed
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
+                var process = new Process();
+                process.StartInfo.FileName = exePath;
+                process.StartInfo.Arguments = args;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
 
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-            process.WaitForExit();
+                process.Start();
 
-            if (!string.IsNullOrEmpty(error))
-                return BadRequest(error);
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
 
-            return Ok(output);
+                process.WaitForExit();
+
+                return Ok(new { Output = output, Error = error, ExitCode = process.ExitCode });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }
