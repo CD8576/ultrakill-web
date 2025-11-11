@@ -12,6 +12,6 @@ app.MapGet("/", () => "Hello! The API is running.");
 app.MapControllers();
 
 // Make sure the app listens on all interfaces (needed for Koyeb)
-app.Urls.Add("http://+:8080");
+app.Urls.Add("http://+:80");
 
 app.Run();
